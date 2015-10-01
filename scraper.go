@@ -140,10 +140,24 @@ func parseGame(date string, z *html.Tokenizer) (Game, error) {
 		gameTime = strings.TrimSpace(t.Data)
 	}
 
-	homeTeam := parseTeamName(z)
-	homeScore := parseScore(z)
-	awayTeam := parseTeamName(z)
-	awayScore := parseScore(z)
+	var homeTeam, homeScore, awayTeam, awayScore string
+
+	skipAwayScore := false
+
+	homeTeam = parseTeamName(z)
+	homeScore = parseScore(z)
+	if len(homeScore) > 3 {
+		awayTeam = homeScore
+		homeScore = ""
+		skipAwayScore = true
+	} else {
+		awayTeam = parseTeamName(z)
+	}
+	if !skipAwayScore {
+		awayScore = parseScore(z)
+	} else {
+		awayScore = ""
+	}
 
 	gameDate, err := time.Parse("1/2/2006 3:04 PM", date+" "+gameTime)
 	if err != nil {
